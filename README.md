@@ -1,105 +1,214 @@
-# AI VENTURE BUILDER v0.2
+# AI VENTURE BUILDER v0.3
 
-公開されている無料資産を、根拠のある0円事業へ組み立てるための、無料自動継続・ローカル優先のEvidence-first MVPです。
+**PAID PAIN → PUBLIC ASSET → MVP**
 
-## できること
+AI VENTURE BUILDERは、面白いOSSからビジネスを考えるツールではありません。
 
-- ブラウザからGitHub公開Repositoryを検索
-- CLI / GitHub ActionsからGitLab公開プロジェクト、Hugging Faceモデル・データセット、日本政府e-Govデータカタログを検索
-- ライセンスを `PASS / REVIEW / EXCLUDE` に分類
-- 有料API・GPU・クラウド依存の可能性を減点
-- 実際に取得した合格資産から、組み合わせ型ビジネス仮説を最大20件生成
-- 顧客、問題、収益方法、販売チャネル、自律稼働率、Kill Criteriaを表示
-- 支払い・売上、契約・発注、求人、購入済みレビュー、困りごとなどの市場証拠を区別して再スコア
-- 競合の存在だけでは需要と判定せず、TOP5の強制反証とBuild Gateを適用
-- JSONスナップショット、Markdownレポート、MVP Build Briefを書き出し
-- GitHub公開Repositoryを作成順に100件ずつ棚卸しし、前回地点から再開
-- 全件の一次判定と、有望候補だけのREADME・ライセンス・Release・Contributor深掘り
-- インベントリのcursor、深掘り待ちキュー、注目候補を公開JSONとして保存
-- 個人情報・APIキー・トークンを保存しない
+まず「誰が、何に困り、実際にお金を払っているか」を証拠化し、その問題を追加費用0円の公開資産で解決できる場合だけMVP構築へ進む、Demand-firstの事業開発システムです。
 
-## 起動
+公開ページ: https://y-ai-lab.github.io/ai-venture-builder/
 
-Node.js 20以上があれば、プロジェクト直下で次を実行します。
+## v0.3で変えたこと
 
-```bash
-python3 -m http.server 4173
+v0.2までは公開Repositoryを先に探索し、そこから事業仮説を作る「Asset-first」でした。
+
+v0.3では順番を逆転しました。
+
+```text
+実際にお金が動いている悩み
+        ↓
+PAID PAIN GATE
+        ↓
+悩みから検索語を生成
+        ↓
+GitHub等の無料公開資産を探索
+        ↓
+LICENSE / ¥0 COST GUARD
+        ↓
+BUILD GATE
+        ↓
+1日以内のMVP
+        ↓
+販売検証
 ```
 
-ブラウザで `http://localhost:4173` を開き、「探索を開始」を押します。
+## PAID PAIN GATE
 
-ブラウザ実行はCORSと公開API制限を考慮してGitHubのみです。全ソースを取得する場合は別ターミナルで次を実行します。
+公開資産探索の前に、以下を必須にしています。
 
-```bash
-npm run scout
-```
+- 顧客が明確
+- 悩みが明確
+- `sale / contract / paid_review` の実支払い証拠が最低1件
+- 補助証拠を含め需要証拠が合計3件以上
+- 最初の販売チャネルが決定済み
+- 価格が決定済み
+- 最初の顧客への到達方法が決定済み
+- Kill Criteria設定済み
+- 追加費用0円で構築可能
+- 1日以内のMVPに切れている
+- AI自律稼働率70%以上
 
-取得結果は `data/latest-scout.json` に保存され、「保存済みデータを読み込む」から表示できます。
+1つでも欠ける場合は `NO BUILD` です。
 
-ネットワークなしの動作確認は次です。
+## 需要証拠
 
-```bash
-npm run scout:dry
-npm run inventory:dry
-npm run qa
-```
+証拠は次の種類を区別します。
 
-## FULL INVENTORY / DEEP SCOUT
+### 実支払い証拠
 
-通常のSCOUTは検索語ごとの候補探索です。全件を分析対象にしたい場合は、`scripts/full-inventory.mjs`を使います。
+- `sale`: 実際の販売実績
+- `contract`: 契約済み実績
+- `paid_review`: 購入済みレビュー
 
-- `GET https://api.github.com/repositories`を作成順のカタログとして使用
-- 1回の実行で最大100件を取得し、最後のRepository IDを`data/inventory-state.json`へ保存
-- 次回はそのIDから再開するため、長時間の全件棚卸しを分割できる
-- 一次判定は取得した全件に行い、用途・更新・利用シグナルの強い候補を深掘りキューへ追加
-- 深掘りではRepository詳細、README、Release、Contributor情報を確認
-- ライセンス不明は深掘り後も`NO_LICENSE`として商用候補から除外し、判断不能は`LICENSE_REVIEW_REQUIRED`に残す
-- トークンは`GITHUB_TOKEN`または`SCOUT_GITHUB_TOKEN`から実行時だけ読み、ファイルへ保存しない
+### 補助証拠
 
-ローカルでは次のように実行できます。
+- `job`: 予算付き発注・求人
+- `complaint`: 具体的な困りごと
+- `price_displayed`: 表示価格
+- `competitor_only`: 競合の存在
 
-```bash
-npm run inventory -- --batch-size 100 --deep-limit 8
-```
+表示価格や競合があるだけではBuild Gateを通しません。
 
-公開Repositoryでは`.github/workflows/full-inventory.yml`を毎日自動実行します（日本時間03:17目安）。Actions画面からの手動実行も残しています。ワークフローが保存するのは棚卸しメタデータと候補情報であり、Source codeやSecretは保存しません。GitHub Pagesの画面にある「進捗・注目候補を読み込む」から結果を確認できます。
+Marketplaceの規約を無視した自動スクレイピングは行いません。CrowdWorks、ココナラ、Upwork等の証拠は、ブラウザ調査やChatGPT Work等で確認した根拠URLを登録する前提です。
 
-## GitHub Actions
+## PUBLIC ASSET SCOUT
 
-`.github/workflows/scout.yml` は `workflow_dispatch` のみです。定期cronは設定していません。
+PAID PAIN GATEを通過した後だけ、ブラウザからGitHub公開APIを利用できます。
 
-公開Repositoryへ配置した後、Actions画面から手動実行すると、GitHub・GitLab・Hugging Faceの公開APIを調べ、`data/latest-scout.json`を更新します。APIキーや個人のSecretは使いません。GitHubが自動付与する書き込みトークンはワークフロー実行中だけ使われ、Repositoryへ保存されません。
+顧客の悩み・解決ヒントから検索語を生成し、公開Repositoryを検索します。
 
-`.github/workflows/pages.yml` はGitHub Pagesへの公開用です。公開ボタン・Repository作成・Actions実行は、アカウント権限が必要なため人間承認の対象です。
+候補は以下を確認します。
+
+- License
+- Stars
+- 更新日時
+- Archivedか
+- Forkか
+- 使用言語
+- 説明
+
+MVP部品として選択できるのは、初期判定で `PASS` になったLicenseのみです。
+
+## LICENSE GUARD
+
+初期PASS候補:
+
+- MIT
+- Apache-2.0
+- BSD-2-Clause
+- BSD-3-Clause
+- ISC
+- Unlicense
+- CC0-1.0
+
+GPL / LGPL / AGPL / MPL / EPL等は `REVIEW` とし、v0.3の自動Build Gateでは通しません。
+
+No License / 不明Licenseは `EXCLUDE` です。
+
+PASS判定は法的保証ではありません。実際の商用利用前には元RepositoryのLICENSE・README・依存関係を確認してください。
+
+## BUILD GATE
+
+MVP構築へ進めるのは、以下の両方を満たす場合だけです。
+
+1. PAID PAIN GATE通過
+2. PASS Licenseの公開資産を最低1件選択
+
+通過するとBuild Briefを生成できます。
+
+Build Briefには、
+
+- 顧客
+- お金が動いている悩み
+- 需要証拠
+- 最初に売るもの
+- 価格
+- 販売チャネル
+- 最初の顧客への到達方法
+- 使用する無料公開資産
+- AI自律稼働率
+- Kill Criteria
+
+が入ります。
+
+このBriefをChatGPT Work / Codexへ渡し、初めてMVP実装を開始します。
+
+## FULL INVENTORYについて
+
+GitHub公開Repositoryを作成順に100件ずつ読む旧FULL INVENTORYの**定期実行は停止しました**。
+
+理由:
+
+- GitHub全件を読むこと自体に事業価値がない
+- 古いRepositoryから順番に見るため収益候補密度が低い
+- 400件確認して深掘り候補0件だった
+- 資産から無理に事業を作る方向へ戻りやすい
+
+旧スクリプト `scripts/full-inventory.mjs` は検証記録として残していますが、通常フローでは使用しません。GitHub ActionsのFULL INVENTORY workflowは削除済みです。
 
 ## 0円ガード
 
-このMVPは外部の有料AI API、課金DB、VPS、有料ドメイン、自動化SaaSを使いません。AIによる最終的な市場判断は、ChatGPT WorkでWeb上の証拠を確認してから行う前提です。アプリの仮説生成は、API課金なしで再現できるルールベース処理です。
+v0.3は以下を前提にしています。
 
-GitHub PagesはGitHub Freeの公開Repositoryで利用可能と案内されています。標準GitHub-hosted runnerは公開Repositoryで無料と案内されています。一方、未認証GitHub REST APIには通常60リクエスト/時の制限があるため、取得は直列・少量にしています。条件は変わり得るため、公開前に公式情報を再確認してください。
+- Public GitHub Repository
+- GitHub Pages
+- GitHub公開API
+- ブラウザLocalStorage
+- 有料AI APIなし
+- VPSなし
+- 有料DBなし
+- 有料ドメインなし
+- 有料スクレイピングサービスなし
 
-- [GitHub Pages — What is GitHub Pages?](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
-- [GitHub Actions — Billing and usage](https://docs.github.com/en/actions/concepts/billing-and-usage)
-- [GitHub REST API — Rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)
-- [GitLab — Projects API](https://docs.gitlab.com/api/projects/)
-- [Hugging Face — Hub API](https://huggingface.co/docs/hub/api)
-- [e-Govデータポータル — メタデータ取得API](https://data.e-gov.go.jp/data/api_guide)
+外部Marketplaceを無理に自動取得する代わりに、支払証拠は根拠URLとともに登録します。
 
-## ライセンス運用
+## データ保存
 
-`MIT / Apache-2.0 / BSD系 / ISC / Unlicense / CC0 / CC-BY`を初期のPASS候補とし、GPL系・AGPL・SSPL・BSL・MPL・ODbL・独自条件などはREVIEWにします。ライセンス不明、商用利用不可、権利条件不明はEXCLUDEです。
+顧客・悩み・需要証拠・探索結果・選択した公開資産は、原則としてブラウザのLocalStorageへ保存します。
 
-PASSは法的保証ではありません。最終的に採用する資産は、元Repository・LICENSE・README・モデルカード・データセット条件を人間が確認してください。
+個人情報、API Key、Token、Cookie、Passwordは保存しません。
 
-## v0.2の境界
+## QA
 
-この版は、候補探索・除外・実資産ベースの仮説化・証拠管理・強制反証・Build Gate・Build Brief作成までを担当します。市場証拠がない仮説を「売れる」と判定しません。決済、営業DM、契約、Marketplace登録、不可逆な公開は自動実行しません。
+```bash
+npm run qa
+```
 
-ChatGPT Work側での起動条件と、Web調査・アプリ・人間承認の分担は [OPERATOR_RUNBOOK.md](./OPERATOR_RUNBOOK.md) にまとめています。実行用の指示書は [docs/MASTER_PROMPT_v0.2.md](./docs/MASTER_PROMPT_v0.2.md)、全体設計は [docs/AI_VENTURE_BUILDER_v0.2.md](./docs/AI_VENTURE_BUILDER_v0.2.md) を参照してください。
+v0.3では最低限以下をテストします。
 
-## 既存MVP
+- 支払証拠不足ではPAID PAIN GATEを通さない
+- 実支払1件＋合計3件の需要証拠でGate通過
+- 悩みからGitHub検索語を生成
+- MIT / ApacheをPASS
+- AGPLをPASSにしない
+- No LicenseをEXCLUDE
+- 公開資産未選択ではBuild禁止
+- Demand Gate + PASS資産でBuild許可
+- Build Brief生成
 
-今回作成した「OSS 商用利用前チェック」は別Repository・別URLで保存しています。Builder v0.2の変更で上書きしません。
+GitHub Actionsの `Demand-first QA` でもpush時に実行します。
 
-- https://github.com/y-ai-lab/oss-license-preflight
-- https://y-ai-lab.github.io/oss-license-preflight/
+## AI VALUE RADARとの関係
+
+AI VALUE RADARとは別レーンです。
+
+- AI VALUE RADAR: 市場・AI/SaaS情報を継続監視する部門
+- AI VENTURE BUILDER: 実際に金が動いている悩みからMVPを作る部門
+
+VALUE RADARのRepositoryや処理はこの変更では触りません。
+
+## 最重要ルール
+
+**先に作らない。先に売れている問題を確認する。**
+
+```text
+今日は何を作る？
+```
+
+ではなく、
+
+```text
+今日はどこで実際にお金が動いている？
+```
+
+から始めます。
