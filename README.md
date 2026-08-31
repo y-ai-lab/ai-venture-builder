@@ -1,6 +1,6 @@
 # AI VENTURE BUILDER v0.2
 
-公開されている無料資産を、根拠のある0円事業へ組み立てるための、手動起動・ローカル優先のEvidence-first MVPです。
+公開されている無料資産を、根拠のある0円事業へ組み立てるための、無料自動継続・ローカル優先のEvidence-first MVPです。
 
 ## できること
 
@@ -62,7 +62,7 @@ npm run qa
 npm run inventory -- --batch-size 100 --deep-limit 8
 ```
 
-公開Repositoryでは`.github/workflows/full-inventory.yml`をActions画面から手動実行します。定期cronは設定していません。ワークフローが保存するのは棚卸しメタデータと候補情報であり、Source codeやSecretは保存しません。GitHub Pagesの画面にある「進捗・注目候補を読み込む」から結果を確認できます。
+公開Repositoryでは`.github/workflows/full-inventory.yml`を毎日自動実行します（日本時間03:17目安）。Actions画面からの手動実行も残しています。ワークフローが保存するのは棚卸しメタデータと候補情報であり、Source codeやSecretは保存しません。GitHub Pagesの画面にある「進捗・注目候補を読み込む」から結果を確認できます。
 
 ## GitHub Actions
 

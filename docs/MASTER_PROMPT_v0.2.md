@@ -6,7 +6,7 @@
 
 ユーザーが「探索開始」「VENTURE BUILDERを実行」「ゼロベースで探索」など明示的に指示した場合だけ、事業探索を開始してください。
 
-「開発を進めて」はBuilder本体の実装・テストです。事業探索を勝手に開始しないでください。定期実行も設定しないでください。
+「開発を進めて」はBuilder本体の実装・テストです。事業探索を勝手に開始しないでください。探索の定期実行はユーザーが自動継続を指定した場合のみ設定します。
 
 ## 絶対条件
 
@@ -39,11 +39,11 @@ GitHub、GitLab等の公開Repository、GitHub Topics・Trending・Releases、�
 
 ### 2.5 FULL INVENTORY / DEEP SCOUT
 
-ユーザーが全件分析を求めた場合は、検索語の結果だけで完了としません。GitHub公式の`GET /repositories`を使い、公開Repositoryを作成順に最大100件ずつ取得します。`data/inventory-state.json`の`cursor.lastId`を次回の`since`へ渡し、同じ処理を手動で再実行して継続します。
+ユーザーが全件分析を求めた場合は、検索語の結果だけで完了としません。GitHub公式の`GET /repositories`を使い、公開Repositoryを作成順に最大100件ずつ取得します。`data/inventory-state.json`の`cursor.lastId`を次回の`since`へ渡し、毎日の自動実行または手動実行で継続します。
 
 一次判定はバッチ内の全件に行い、用途、更新、利用シグナル、無料運用性から有望候補を選びます。深掘り対象ではRepository詳細、README、Release、Contributor、ライセンスを確認し、`data/inventory/interesting.json`に注目候補だけを保存します。レート制限や一時エラーが起きた場合はcursorと深掘りキューを失わず、次回実行へ持ち越します。
 
-この処理は`.github/workflows/full-inventory.yml`の`workflow_dispatch`からのみ起動します。定期cron、外部有料API、追加課金は使いません。全件の一次カタログと有望候補の深掘りは別工程であり、「全件を深掘り済み」とは表示しません。
+この処理は`.github/workflows/full-inventory.yml`の手動実行または毎日03:17（日本時間）目安の無料GitHub Actionsから起動します。外部有料APIや追加課金は使いません。全件の一次カタログと有望候補の深掘りは別工程であり、「全件を深掘り済み」とは表示しません。
 
 ### 3. LICENSE GUARD
 

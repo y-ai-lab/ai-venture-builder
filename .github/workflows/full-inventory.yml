@@ -13,6 +13,8 @@ on:
         required: false
         default: "8"
         type: string
+  schedule:
+    - cron: "17 18 * * *"
 
 permissions:
   contents: write
@@ -37,7 +39,7 @@ jobs:
         with:
           node-version: 22
       - name: Run resumable public repository inventory
-        run: node scripts/full-inventory.mjs --batch-size "${{ inputs.batch_size }}" --deep-limit "${{ inputs.deep_limit }}"
+        run: node scripts/full-inventory.mjs --batch-size "${{ inputs.batch_size || '100' }}" --deep-limit "${{ inputs.deep_limit || '8' }}"
       - name: Save inventory progress and highlights
         run: |
           git config user.name "github-actions[bot]"
