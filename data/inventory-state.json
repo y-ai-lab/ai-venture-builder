@@ -5,16 +5,16 @@
   "sourceUrl": "https://api.github.com/repositories",
   "officialUrl": "https://docs.github.com/en/rest/repos/repos#list-public-repositories",
   "mode": "manual-workflow",
-  "status": "not-run",
+  "status": "paused",
   "cursor": {
-    "since": 0,
-    "lastId": 0,
+    "since": 371,
+    "lastId": 371,
     "exhaustedAt": null
   },
   "coverage": {
-    "batches": 0,
-    "cataloged": 0,
-    "primaryScanned": 0,
+    "batches": 1,
+    "cataloged": 100,
+    "primaryScanned": 100,
     "deepScanned": 0,
     "deepPending": 0,
     "deepFailed": 0,
@@ -22,10 +22,34 @@
     "licenseReview": 0,
     "licenseExclude": 0
   },
-  "lastRun": null,
-  "diagnostics": [],
+  "lastRun": {
+    "startedAt": "2026-08-31T07:22:18.941Z",
+    "finishedAt": "2026-08-31T07:22:20.176Z",
+    "batchSize": 100,
+    "deepLimit": 8,
+    "dryRun": false,
+    "catalogedThisRun": 100,
+    "deepScannedThisRun": 0,
+    "rateLimitPaused": false
+  },
+  "diagnostics": [
+    {
+      "at": "2026-08-31T07:22:20.173Z",
+      "stage": "catalog",
+      "status": "ok",
+      "count": 100,
+      "rateLimitRemaining": 4999
+    },
+    {
+      "at": "2026-08-31T07:22:20.175Z",
+      "stage": "primary",
+      "status": "ok",
+      "count": 100,
+      "deepCandidatesQueued": 0
+    }
+  ],
   "deepQueue": [],
   "failedDeep": [],
   "topCandidates": [],
-  "lastShard": null
+  "lastShard": "data/inventory/shards/catalog-1-371.json"
 }
