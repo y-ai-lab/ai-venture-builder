@@ -1,4 +1,4 @@
-# AI VENTURE BUILDER v0.2 — Operator Runbook
+# AI VENTURE BUILDER v0.3 — Operator Runbook
 
 ## 起動条件
 
@@ -8,63 +8,124 @@
 - VENTURE BUILDERを実行
 - ゼロベースで探索
 
-「開発を進めて」はBuilder本体の実装・テストとして扱い、事業探索は開始しない。定期実行もしない。
+定期的なFULL INVENTORYは行わない。
+
+## 最重要原則
+
+**PUBLIC ASSET → BUSINESS をやめ、PAID PAIN → PUBLIC ASSET → MVP の順にする。**
+
+公開資産は事業アイデアの起点ではなく、すでにお金が動いている問題を解決するための部品として扱う。
 
 ## 実行順序
 
-1. **Run Gate** — 目的、0円条件、対象市場、禁止事項を確認する。
-2. **SCOUT** — GitHub、GitLab、Hugging Face、政府データ等の公開API・公開ページを調査する。
-3. **FULL INVENTORY（自動継続）** — GitHub公開Repositoryを作成順に100件ずつ取得し、最後のIDをcursorとして保存する。全件に一次判定を行い、有望候補だけ深掘りキューへ送る。毎日03:17（日本時間）目安に自動実行し、手動実行も可能。
-4. **NORMALIZE** — 出典URL、取得日時、ライセンス、利用条件、依存、費用、更新状況を記録する。
-5. **FILTER** — `No License`、商用利用不可、費用不明、規約上危険、個人情報必須、維持負担過大を除外する。
-6. **COMPOSE** — 実際に残った資産を2〜4個組み合わせ、顧客・問題・出力物・差別化を定義する。
-7. **VALIDATE** — 支払い・売上、契約・発注、求人、有料レビュー、困りごとの証拠をWebで確認する。
-8. **SCORE** — 指定の100点配点で計算する。競合存在だけでは需要点を加算しない。
-9. **FALSIFY** — TOP5すべてについて、無料代替、大手参入、規約、法律、著作権、維持負担、価格競争を確認する。
-10. **BUILD GATE** — 証拠・ライセンス・0円条件・反証を通過した1位だけを採用する。条件不足なら`NO BUILD`。
-11. **BUILDER / QA** — 最初の1円を検証できる最小MVPを実装し、実際にテストする。
-12. **MONETIZE / HANDOFF** — 価格、販売チャネル、納品方法、Kill Criteria、次の操作1つを提示する。
+1. **PAID PAIN SCOUT** — CrowdWorks、ココナラ、Upwork、Fiverr、購入済みレビュー、契約事例等から「誰が何にお金を払っているか」を調査する。
+2. **EVIDENCE REGISTER** — 表示価格と実販売、募集金額と契約金額を分けて証拠を登録する。
+3. **PAID PAIN GATE** — 顧客・悩み・実支払証拠・価格・販売チャネル等を確認。1つでも不足なら`NO BUILD`。
+4. **ASSET QUERY** — 悩みから解決部品の検索語を生成する。
+5. **PUBLIC ASSET SCOUT** — GitHub、Hugging Face、Open Data等から無料公開資産を探す。
+6. **LICENSE / FREE GUARD** — 商用利用条件と追加費用0円を確認する。
+7. **BUILD GATE** — PASS Licenseの公開資産を選択し、全条件を再確認する。
+8. **BUILDER** — 1日以内に作れる最小MVPだけ実装する。
+9. **QA** — 正常動作、エラー、License、Secret、0円運用を確認する。
+10. **SELL / TEST** — 決めた1チャネルで最初の1円を検証する。
+11. **KILL / IMPROVE** — Kill Criteriaに沿って停止・改善を判断する。
+
+## PAID PAIN GATE 必須条件
+
+以下すべてが必要。
+
+- 明確な顧客
+- 明確な悩み
+- `sale / contract / paid_review` の実支払証拠を最低1件
+- 補助証拠を含め需要証拠が合計3件以上
+- 最初の販売チャネルが決定済み
+- 価格が決定済み
+- 最初の顧客への到達方法が決定済み
+- Kill Criteria設定済み
+- 追加費用0円
+- 1日以内のMVP
+- AI自律稼働率70%以上
+
+1項目でも欠ける場合、公開資産探索を開始しない。
 
 ## 証拠ルール
 
-記録する各証拠には、`type`、`url`、`observedAt`、`note`を付ける。
-
-- `sale`: 実際の支払い・売上
-- `contract`: 契約・発注・有償案件
-- `job`: 求人・業務委託募集
-- `paid_review`: 有料レビュー・導入事例
+- `sale`: 実際の販売実績
+- `contract`: 契約済み実績
+- `paid_review`: 購入済みレビュー
+- `job`: 予算付き発注・求人
 - `complaint`: 具体的な困りごと
-- `price_displayed`: 価格表示だけ。販売実績とは扱わない
-- `competitor_only`: 競合の存在だけ。需要点は0点
+- `price_displayed`: 表示価格のみ
+- `competitor_only`: 競合の存在のみ
 
-同一ページを複数証拠として登録しない。表示価格と実販売価格、募集金額と契約金額を分ける。
+同一ページを複数証拠として水増ししない。
 
-## Build Gateの停止条件
+`price_displayed`と`competitor_only`だけではBuildしない。
 
-- ライセンスが`PASS`でない
-- 有料API、GPU課金、VPS、有料DB、カード登録が必須
-- 支払い・契約・求人等の需要証拠が不足
-- 顧客、問題、初回支払い、納品物が未定義
-- TOP5の反証が未完了
-- 個人情報・機密情報の保存が必須
-- 規約・著作権・法律上の確認ができない
+## Marketplace調査
 
-## 人間の承認が必要な操作
+CrowdWorks、ココナラ、Upwork等を、規約を無視してGitHub Actionsから自動スクレイピングしない。
 
-- GitHubログイン、OAuth、Secret登録
-- Repository・Webサイトの公開
-- 決済・アフィリエイト登録
+Paid Painの調査は、Webブラウジング可能なChatGPT Work / 通常チャット / 人間のブラウザ確認を利用し、根拠URLをBuilderへ登録する。
+
+目的は「自動取得率100%」ではなく「需要証拠を間違えない」こと。
+
+## Public Asset Scout
+
+PAID PAIN GATE通過後にのみ実行する。
+
+優先:
+
+- GitHub公式公開API
+- Hugging Face公開情報
+- 政府Open Data
+- 公開API / RSS
+
+資産起点で新しい事業アイデアを増やさない。
+
+## FULL INVENTORY
+
+旧FULL INVENTORYは停止済み。
+
+- 毎日100Repositoryを古い順に読む処理は廃止
+- GitHub Actions workflowは削除
+- `scripts/full-inventory.mjs`は過去検証用のLegacyとしてのみ残す
+
+再開する場合も、明確なPaid Painから必要な資産カテゴリが判明した時だけ。
+
+## Build Gate停止条件
+
+- PAID PAIN GATE未通過
+- 使用する公開資産がない
+- LicenseがPASSでない
+- 有料API / VPS / GPU課金 / 有料DB等が必須
+- 最初の販売方法が決まっていない
+- AI自律稼働率70%未満
+- 1日MVPに切れていない
+- Kill Criteriaがない
+
+## 人間承認が必要な操作
+
+- 外部サービスのログイン・OAuth
+- 不可逆なWeb公開
+- Marketplace出品
 - 営業メール・DM・投稿
-- 契約、支払い、購入
+- 契約・支払い・購入
+- Affiliate申請
 - 個人情報を扱う設計
 
-調査、コード作成、サンプル生成、ローカルテスト、README作成は自律的に進める。
+調査整理、検索語生成、GitHub探索、コード作成、テスト、Build Brief生成は可能な限りAI側で進める。
 
-## 既存MVPの保管
+## 成功判定
 
-「OSS 商用利用前チェック」はBuilder v0.2とは別成果物として扱う。既存Repositoryと公開URLを変更しない。
+Builderの成功は「MVPを何個作ったか」では測らない。
 
-- Repository: https://github.com/y-ai-lab/oss-license-preflight
-- Pages: https://y-ai-lab.github.io/oss-license-preflight/
+優先KPI:
 
-新候補のMVPは別フォルダ、別Repository、別URLで作成する。
+1. Paid Painを何件正しく確認できたか
+2. Build Gateを通過した事業数
+3. 実際の応募・販売・問い合わせ数
+4. 最初の売上
+5. 人間作業時間
+
+**売上検証前に制作物を増やさない。**
