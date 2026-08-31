@@ -1,0 +1,23 @@
+name: Demand-first QA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Run v0.3 QA
+        run: node scripts/qa-v3.mjs
