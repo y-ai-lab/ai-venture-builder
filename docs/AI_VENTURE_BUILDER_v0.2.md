@@ -23,6 +23,7 @@
 | --- | --- | --- |
 | 0 | Run Gate | ユーザーの明示的な起動指示を確認。定期実行ではない |
 | 1 | SCOUT | GitHub、GitLab、Hugging Face、政府データ等の公開資産を取得 |
+| 1.5 | FULL INVENTORY / DEEP SCOUT | GitHub公開Repositoryを作成順に100件ずつ棚卸しし、cursorから再開。全件を一次判定、有望候補のみ深掘り |
 | 2 | NORMALIZE | 出典URL、取得日時、ライセンス、利用条件、費用要件を構造化 |
 | 3 | FILTER | ライセンス・0円・法務・個人情報・維持負担で除外 |
 | 4 | COMPOSE | 実際の資産を2〜4個組み合わせ、出力物と差別化を定義 |

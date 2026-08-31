@@ -7,6 +7,8 @@
   "scripts": {
     "scout": "node scripts/scout.mjs",
     "scout:dry": "node scripts/scout.mjs --dry-run",
+    "inventory": "node scripts/full-inventory.mjs",
+    "inventory:dry": "node scripts/full-inventory.mjs --dry-run",
     "qa": "node scripts/qa.mjs",
     "qa:v2": "node scripts/qa-v2.mjs"
   },

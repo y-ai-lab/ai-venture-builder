@@ -18,6 +18,8 @@ import {
 
 const STORAGE_KEY = "ai-venture-builder:v0.2:state";
 const GITHUB_ENDPOINT = "https://api.github.com/search/repositories";
+const INVENTORY_STATE_PATH = "data/inventory-state.json";
+const INVENTORY_HIGHLIGHTS_PATH = "data/inventory/interesting.json";
 const GITHUB_HEADERS = {
   accept: "application/vnd.github+json",
   "x-github-api-version": "2022-11-28",
@@ -46,6 +48,41 @@ function makeInitialState() {
     sourceCounts: {},
     diagnostics: [],
     logs: [],
+    inventory: makeEmptyInventoryState(),
+  };
+}
+
+function makeEmptyInventoryState() {
+  return {
+    schemaVersion: "1.0.0",
+    mode: "manual-workflow",
+    status: "not-run",
+    cursor: { since: 0, lastId: 0, exhaustedAt: null },
+    coverage: {
+      batches: 0,
+      cataloged: 0,
+      primaryScanned: 0,
+      deepScanned: 0,
+      deepPending: 0,
+      deepFailed: 0,
+      licensePass: 0,
+      licenseReview: 0,
+      licenseExclude: 0,
+    },
+    lastRun: null,
+    diagnostics: [],
+    topCandidates: [],
+  };
+}
+
+function mergeInventoryState(inventory) {
+  const base = makeEmptyInventoryState();
+  return {
+    ...base,
+    ...(inventory || {}),
+    cursor: { ...base.cursor, ...(inventory?.cursor || {}) },
+    coverage: { ...base.coverage, ...(inventory?.coverage || {}) },
+    topCandidates: Array.isArray(inventory?.topCandidates) ? inventory.topCandidates : [],
   };
 }
 
@@ -114,7 +151,7 @@ function loadLocalState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
     if (saved?.schemaVersion === APP_VERSION && Array.isArray(saved.assets)) {
-      state = { ...makeInitialState(), ...saved, run: { ...makeInitialState().run, ...(saved.run || {}) } };
+      state = { ...makeInitialState(), ...saved, run: { ...makeInitialState().run, ...(saved.run || {}) }, inventory: mergeInventoryState(saved.inventory) };
       state.falsificationByHypothesis = saved.falsificationByHypothesis || {};
       state.filtered = filterAssets(state.assets);
       state.hypotheses = rankHypothesesV2(state.hypotheses || [], state.evidenceByHypothesis || {}, state.falsificationByHypothesis);
@@ -166,7 +203,9 @@ async function runBrowserScout() {
   running = true;
   const button = $("#runButton");
   button.disabled = true;
+  const inventory = state.inventory;
   state = makeInitialState();
+  state.inventory = inventory;
   state.run.status = "running";
   state.run.mode = "browser-github";
   state.run.startedAt = new Date().toISOString();
@@ -230,7 +269,9 @@ async function loadSnapshot() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const snapshot = await response.json();
     if (!Array.isArray(snapshot.assets)) throw new Error("assetsがありません");
+    const inventory = state.inventory;
     state = makeInitialState();
+    state.inventory = inventory;
     state.assets = snapshot.assets;
     state.run = {
       status: snapshot.mode === "dry-run" ? "dry-run" : "loaded",
@@ -251,6 +292,35 @@ async function loadSnapshot() {
   } catch (error) {
     setToast("保存済みデータを読み込めませんでした。HTTPサーバー経由で開いてください。", "error");
     log(`スナップショット読み込み失敗: ${error.message}`, "error");
+  }
+}
+
+async function loadInventorySnapshot({ silent = false } = {}) {
+  try {
+    const [stateResponse, highlightsResponse] = await Promise.all([
+      fetch(`${INVENTORY_STATE_PATH}?ts=${Date.now()}`, { cache: "no-store" }),
+      fetch(`${INVENTORY_HIGHLIGHTS_PATH}?ts=${Date.now()}`, { cache: "no-store" }),
+    ]);
+    if (!stateResponse.ok) throw new Error(`HTTP ${stateResponse.status}`);
+    const snapshot = await stateResponse.json();
+    let topCandidates = Array.isArray(snapshot.topCandidates) ? snapshot.topCandidates : [];
+    if (highlightsResponse.ok) {
+      const highlights = await highlightsResponse.json();
+      if (Array.isArray(highlights.candidates)) topCandidates = highlights.candidates;
+    }
+    state.inventory = mergeInventoryState({ ...snapshot, topCandidates });
+    renderAll();
+    saveState();
+    if (!silent) {
+      const count = state.inventory.coverage.cataloged || 0;
+      setToast(`FULL INVENTORYの進捗を読み込みました。棚卸し ${formatNumber(count)}件。`);
+      log("FULL INVENTORYの保存済み進捗を読み込みました。");
+    }
+  } catch (error) {
+    if (!silent) {
+      setToast("インベントリを読み込めませんでした。公開PagesまたはHTTPサーバー経由で開いてください。", "error");
+      log(`FULL INVENTORY読み込み失敗: ${error.message}`, "error");
+    }
   }
 }
 
@@ -424,6 +494,64 @@ function renderDiscoveryLab() {
   combinations.innerHTML = `<article class="combination-card"><div class="combination-assets"><a href="${safeHref(pair.left.url)}" target="_blank" rel="noreferrer noopener"><span>資産A</span><b>${escapeHtml(pair.left.name)}</b><em>${escapeHtml(pair.left.licenseLabel || "LICENSE_REVIEW_REQUIRED")}</em></a><span class="combination-plus">＋</span><a href="${safeHref(pair.right.url)}" target="_blank" rel="noreferrer noopener"><span>資産B</span><b>${escapeHtml(pair.right.name)}</b><em>${escapeHtml(pair.right.licenseLabel || "LICENSE_REVIEW_REQUIRED")}</em></a></div><div class="combination-arrow">↓</div><div class="combination-result"><small>仮説</small><h4>${escapeHtml(title)}</h4><p>${escapeHtml(output)}</p><span>まずは静的な入力・判定・レポートで、支払意欲を検証する</span></div></article>`;
 }
 
+function inventoryStatusLabel(status) {
+  return {
+    "not-run": "未実行",
+    running: "実行中",
+    paused: "次回へ継続",
+    "paused-rate-limit": "レート制限で一時停止",
+    complete: "現在地点まで完了",
+    "dry-run": "ドライラン",
+    error: "エラー（進捗保存済み）",
+  }[status] || status || "未実行";
+}
+
+function renderInventory() {
+  const panel = $("#inventoryPanel");
+  if (!panel) return;
+  const inventory = mergeInventoryState(state.inventory);
+  state.inventory = inventory;
+  const coverage = inventory.coverage;
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+  setText("inventoryStatus", inventoryStatusLabel(inventory.status));
+  setText("inventoryCataloged", formatNumber(coverage.cataloged));
+  setText("inventoryPrimary", formatNumber(coverage.primaryScanned));
+  setText("inventoryDeep", formatNumber(coverage.deepScanned));
+  setText("inventoryPending", formatNumber(coverage.deepPending));
+  setText("inventoryCursor", `作成順ID #${formatNumber(inventory.cursor.lastId || inventory.cursor.since || 0)}`);
+  setText("inventoryLastRun", inventory.lastRun?.finishedAt ? formatDate(inventory.lastRun.finishedAt) : "未実行");
+  setText("inventoryHighlightCount", `${formatNumber(inventory.topCandidates.length)}件`);
+  const message = $("#inventoryMessage");
+  if (message) {
+    if (inventory.status === "not-run") message.textContent = "Actions画面で「Run workflow」を押すと、次のバッチを手動実行できます。";
+    else if (inventory.status === "paused-rate-limit") message.textContent = "GitHub APIのレート制限で停止しました。時間を置いて同じworkflowを再実行すると続きから再開します。";
+    else if (coverage.deepPending) message.textContent = `一次判定は${formatNumber(coverage.primaryScanned)}件完了。深掘り待ちは${formatNumber(coverage.deepPending)}件です。`;
+    else message.textContent = `前回の手動実行: ${formatDate(inventory.lastRun?.finishedAt)}。cursorから続きます。`;
+  }
+  const list = $("#inventoryHighlights");
+  if (!list) return;
+  const candidates = inventory.topCandidates.slice(0, 6);
+  if (!candidates.length) {
+    list.innerHTML = `<div class="empty-state compact-empty"><strong>まだ深掘り候補はありません</strong><p>GitHub ActionsでFULL INVENTORY / DEEP SCOUTを実行すると、ここに表示されます。</p></div>`;
+    return;
+  }
+  list.innerHTML = candidates.map((candidate, index) => {
+    const statusClass = candidate.licenseDecision === "PASS" ? "pass" : candidate.licenseDecision === "EXCLUDE" ? "exclude" : "review";
+    const reasons = Array.isArray(candidate.primaryReasons) ? candidate.primaryReasons.slice(0, 3) : [];
+    const directions = Array.isArray(candidate.buildDirections) ? candidate.buildDirections.slice(0, 2) : [];
+    return `<article class="inventory-highlight-card">
+      <div class="inventory-highlight-top"><span class="spotlight-no">0${index + 1}</span><span class="source-label">DEEP SCOUT</span><span class="license-pill ${statusClass}">${escapeHtml(candidate.licenseLabel || "LICENSE_REVIEW_REQUIRED")}</span></div>
+      <h3><a href="${safeHref(candidate.url)}" target="_blank" rel="noreferrer noopener">${escapeHtml(candidate.fullName || candidate.name)}</a></h3>
+      <p>${escapeHtml(candidate.description || "説明なし。READMEと利用条件を確認してください。")}</p>
+      <div class="meta-line"><span>${escapeHtml(candidate.category || "other")}</span><span>★ ${formatNumber(candidate.stars || 0)}</span><span>deep ${Number(candidate.deepScore ?? candidate.primaryScore ?? 0).toFixed(1)}</span></div>
+      <div class="inventory-highlight-copy"><b>注目理由</b><span>${escapeHtml(reasons.join(" / ") || "深掘り済み候補")}</span><b>作れそう</b><span>${escapeHtml(directions.join(" / ") || "用途を組み合わせて検討")}</span></div>
+    </article>`;
+  }).join("");
+}
+
 function renderAssets() {
   const list = $("#assetList");
   if (!list) return;
@@ -518,6 +646,7 @@ function renderAll() {
   syncGateStages();
   renderStages();
   renderStats();
+  renderInventory();
   renderDiscoveryLab();
   renderAssets();
   renderHypotheses();
@@ -602,11 +731,14 @@ function addFalsification(hypothesisId, formData) {
 function attachEvents() {
   $("#runButton")?.addEventListener("click", runBrowserScout);
   $("#loadSnapshotButton")?.addEventListener("click", loadSnapshot);
+  $("#loadInventoryButton")?.addEventListener("click", () => loadInventorySnapshot());
   $("#exportJsonButton")?.addEventListener("click", () => downloadFile("venture-builder-snapshot.json", JSON.stringify(state, null, 2), "application/json"));
   $("#exportReportButton")?.addEventListener("click", () => downloadFile("venture-builder-report-v0.2.md", createV2MarkdownReport(state), "text/markdown;charset=utf-8"));
   $("#resetButton")?.addEventListener("click", () => {
     if (!window.confirm("この端末に保存した探索結果を削除しますか？")) return;
+    const inventory = state.inventory;
     state = makeInitialState();
+    state.inventory = inventory;
     localStorage.removeItem(STORAGE_KEY);
     renderAll();
     setToast("ローカル保存データを削除しました。");
@@ -670,6 +802,7 @@ async function init() {
     const snapshot = makeEmptyScoutSnapshot();
     if (snapshot.assets.length) state.assets = snapshot.assets;
   }
+  await loadInventorySnapshot({ silent: true });
 }
 
 init();

@@ -1,0 +1,49 @@
+name: FULL INVENTORY / DEEP SCOUT
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: "作成順に棚卸しする件数（1〜100）"
+        required: false
+        default: "100"
+        type: string
+      deep_limit:
+        description: "有望候補の深掘り件数（0〜25）"
+        required: false
+        default: "8"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-inventory
+  cancel-in-progress: false
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run resumable public repository inventory
+        run: node scripts/full-inventory.mjs --batch-size "${{ inputs.batch_size }}" --deep-limit "${{ inputs.deep_limit }}"
+      - name: Save inventory progress and highlights
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/inventory-state.json data/inventory
+          if git diff --cached --quiet; then
+            echo "No inventory change"
+          else
+            git commit -m "chore: advance venture inventory"
+            git push
+          fi

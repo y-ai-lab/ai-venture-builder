@@ -13,6 +13,9 @@
 - 支払い・売上、契約・発注、求人、購入済みレビュー、困りごとなどの市場証拠を区別して再スコア
 - 競合の存在だけでは需要と判定せず、TOP5の強制反証とBuild Gateを適用
 - JSONスナップショット、Markdownレポート、MVP Build Briefを書き出し
+- GitHub公開Repositoryを作成順に100件ずつ棚卸しし、前回地点から再開
+- 全件の一次判定と、有望候補だけのREADME・ライセンス・Release・Contributor深掘り
+- インベントリのcursor、深掘り待ちキュー、注目候補を公開JSONとして保存
 - 個人情報・APIキー・トークンを保存しない
 
 ## 起動
@@ -37,8 +40,29 @@ npm run scout
 
 ```bash
 npm run scout:dry
+npm run inventory:dry
 npm run qa
 ```
+
+## FULL INVENTORY / DEEP SCOUT
+
+通常のSCOUTは検索語ごとの候補探索です。全件を分析対象にしたい場合は、`scripts/full-inventory.mjs`を使います。
+
+- `GET https://api.github.com/repositories`を作成順のカタログとして使用
+- 1回の実行で最大100件を取得し、最後のRepository IDを`data/inventory-state.json`へ保存
+- 次回はそのIDから再開するため、長時間の全件棚卸しを分割できる
+- 一次判定は取得した全件に行い、用途・更新・利用シグナルの強い候補を深掘りキューへ追加
+- 深掘りではRepository詳細、README、Release、Contributor情報を確認
+- ライセンス不明は深掘り後も`NO_LICENSE`として商用候補から除外し、判断不能は`LICENSE_REVIEW_REQUIRED`に残す
+- トークンは`GITHUB_TOKEN`または`SCOUT_GITHUB_TOKEN`から実行時だけ読み、ファイルへ保存しない
+
+ローカルでは次のように実行できます。
+
+```bash
+npm run inventory -- --batch-size 100 --deep-limit 8
+```
+
+公開Repositoryでは`.github/workflows/full-inventory.yml`をActions画面から手動実行します。定期cronは設定していません。ワークフローが保存するのは棚卸しメタデータと候補情報であり、Source codeやSecretは保存しません。GitHub Pagesの画面にある「進捗・注目候補を読み込む」から結果を確認できます。
 
 ## GitHub Actions
 

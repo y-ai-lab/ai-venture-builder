@@ -37,6 +37,14 @@ GitHub、GitLab等の公開Repository、GitHub Topics・Trending・Releases、�
 
 取得数を水増ししません。API制限や取得失敗は、候補数と分けて記録します。
 
+### 2.5 FULL INVENTORY / DEEP SCOUT
+
+ユーザーが全件分析を求めた場合は、検索語の結果だけで完了としません。GitHub公式の`GET /repositories`を使い、公開Repositoryを作成順に最大100件ずつ取得します。`data/inventory-state.json`の`cursor.lastId`を次回の`since`へ渡し、同じ処理を手動で再実行して継続します。
+
+一次判定はバッチ内の全件に行い、用途、更新、利用シグナル、無料運用性から有望候補を選びます。深掘り対象ではRepository詳細、README、Release、Contributor、ライセンスを確認し、`data/inventory/interesting.json`に注目候補だけを保存します。レート制限や一時エラーが起きた場合はcursorと深掘りキューを失わず、次回実行へ持ち越します。
+
+この処理は`.github/workflows/full-inventory.yml`の`workflow_dispatch`からのみ起動します。定期cron、外部有料API、追加課金は使いません。全件の一次カタログと有望候補の深掘りは別工程であり、「全件を深掘り済み」とは表示しません。
+
 ### 3. LICENSE GUARD
 
 MIT、Apache-2.0、BSD系、ISCなど商用利用が明確なものを優先します。GPL、LGPL、AGPL、SSPL、BSL、MPL、ODbL、独自条件は個別確認に回します。No License、Non-commercial、再配布禁止、条件不明は原則除外します。

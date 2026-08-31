@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "appVersion": "0.2.0",
+  "source": "GitHub public repositories",
+  "sourceUrl": "https://api.github.com/repositories",
+  "officialUrl": "https://docs.github.com/en/rest/repos/repos#list-public-repositories",
+  "mode": "manual-workflow",
+  "status": "not-run",
+  "cursor": {
+    "since": 0,
+    "lastId": 0,
+    "exhaustedAt": null
+  },
+  "coverage": {
+    "batches": 0,
+    "cataloged": 0,
+    "primaryScanned": 0,
+    "deepScanned": 0,
+    "deepPending": 0,
+    "deepFailed": 0,
+    "licensePass": 0,
+    "licenseReview": 0,
+    "licenseExclude": 0
+  },
+  "lastRun": null,
+  "diagnostics": [],
+  "deepQueue": [],
+  "failedDeep": [],
+  "topCandidates": [],
+  "lastShard": null
+}

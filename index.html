@@ -35,6 +35,20 @@
         <div class="command-actions"><div class="live-counter" id="liveCounter">READY</div><button class="primary-button large" id="runButton"><span class="button-pulse"></span>探索を開始</button><button class="secondary-button" id="loadSnapshotButton">保存済みデータを読み込む</button><div class="command-meta"><span>保存先: この端末のみ</span><span>キー不要</span></div></div>
       </section>
 
+      <section class="panel inventory-panel" id="inventoryPanel">
+        <div class="section-head"><div><div class="panel-label">FULL INVENTORY / DEEP SCOUT</div><h2>公開Repositoryを、作成順で棚卸しする。</h2></div><span class="inventory-status" id="inventoryStatus">未実行</span></div>
+        <div class="inventory-intro"><span class="inventory-mark">◎</span><p>「全て」は一度に読み込むという意味ではありません。GitHub公式の公開Repository一覧を100件ずつ、前回のIDから再開します。一次判定は全件に行い、ライセンス・README・更新状況などの深掘りは有望候補に絞ります。</p></div>
+        <div class="inventory-grid">
+          <article class="inventory-stat"><span>CATALOGED</span><strong id="inventoryCataloged">0</strong><small>棚卸し済み</small></article>
+          <article class="inventory-stat"><span>PRIMARY SCAN</span><strong id="inventoryPrimary">0</strong><small>一次判定済み</small></article>
+          <article class="inventory-stat"><span>DEEP SCAN</span><strong id="inventoryDeep">0</strong><small>深掘り済み</small></article>
+          <article class="inventory-stat"><span>DEEP QUEUE</span><strong id="inventoryPending">0</strong><small>次回へ持ち越し</small></article>
+        </div>
+        <div class="inventory-meta-grid"><div><small>現在地点</small><strong id="inventoryCursor">作成順ID #0</strong></div><div><small>最終実行</small><strong id="inventoryLastRun">未実行</strong></div><div><small>注目候補</small><strong id="inventoryHighlightCount">0件</strong></div></div>
+        <div class="inventory-actions"><button class="secondary-button" id="loadInventoryButton">進捗・注目候補を読み込む</button><a class="secondary-button" href="https://github.com/y-ai-lab/ai-venture-builder/actions/workflows/full-inventory.yml" target="_blank" rel="noreferrer noopener">GitHub Actionsを開く ↗</a><span class="inventory-message" id="inventoryMessage">Actions画面で「Run workflow」を押すと、次のバッチを手動実行できます。</span></div>
+        <div class="inventory-highlights" id="inventoryHighlights"><div class="empty-state compact-empty"><strong>まだ深掘り候補はありません</strong><p>GitHub ActionsでFULL INVENTORY / DEEP SCOUTを実行すると、ここに表示されます。</p></div></div>
+      </section>
+
       <section class="pipeline panel">
         <div class="pipeline-head"><div><div class="panel-label">PIPELINE</div><h2>候補を、通過させる。</h2></div><div class="pipeline-state"><span id="runMode">待機中</span><span>最終実行 <b id="lastRun">未実行</b></span></div></div>
         <div class="stage-grid">
