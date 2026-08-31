@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="公開資産から0円で検証可能な事業を組み立てる、手動起動型のAI Venture Builder。" />
+    <meta name="theme-color" content="#0c1118" />
+    <title>AI Venture Builder v0.2</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <header class="topbar app-shell">
+      <a class="brand" href="./" aria-label="AI Venture Builder home">
+        <span class="brand-mark"><i></i><i></i><i></i></span>
+        <span><strong>AI VENTURE</strong><small>BUILDER v0.2</small></span>
+      </a>
+      <div class="topbar-right"><span class="status-dot"><i></i> MANUAL RUN ONLY</span><span class="cost-badge">¥0 COST GUARD</span></div>
+    </header>
+
+    <main class="app-shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow accent">PUBLIC ASSET → REVENUE TEST</p>
+          <h1>公開資産を、<br /><em>事業に変える。</em></h1>
+          <p class="hero-lede">OSS・公開データ・無料インフラを部品として組み合わせ、誰かが最初の1円を払う可能性があるところまで絞り込む。</p>
+          <div class="hero-notes"><span><b>01</b> 探索</span><span><b>02</b> 反証</span><span><b>03</b> Build Gate</span></div>
+        </div>
+        <div class="radar-orbit" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div><div class="radar-core"><span>AVB</span><small>0.2</small></div><span class="radar-node node-a">OSS</span><span class="radar-node node-b">DATA</span><span class="radar-node node-c">AI</span></div>
+      </section>
+
+      <section class="command-panel panel">
+        <div class="command-copy"><div class="panel-label"><span class="live-led"></span> COMMAND CENTER</div><h2>探索は、あなたの合図で始まる。</h2><p>自動定期実行なし。手動起動した時だけ公開APIを調査します。</p><div class="source-list" id="sourceList"><span class="muted">まだデータがありません</span></div></div>
+        <div class="command-actions"><div class="live-counter" id="liveCounter">READY</div><button class="primary-button large" id="runButton"><span class="button-pulse"></span>探索を開始</button><button class="secondary-button" id="loadSnapshotButton">保存済みデータを読み込む</button><div class="command-meta"><span>保存先: この端末のみ</span><span>キー不要</span></div></div>
+      </section>
+
+      <section class="pipeline panel">
+        <div class="pipeline-head"><div><div class="panel-label">PIPELINE</div><h2>候補を、通過させる。</h2></div><div class="pipeline-state"><span id="runMode">待機中</span><span>最終実行 <b id="lastRun">未実行</b></span></div></div>
+        <div class="stage-grid">
+          <div class="stage active" data-stage="scout"><span class="stage-no">01</span><span class="stage-name">SCOUT<small>公開資産探索</small></span><span class="stage-status">待機</span></div>
+          <div class="stage" data-stage="filter"><span class="stage-no">02</span><span class="stage-name">FILTER<small>License / Free Guard</small></span><span class="stage-status">待機</span></div>
+          <div class="stage" data-stage="compose"><span class="stage-no">03</span><span class="stage-name">COMPOSE<small>組み合わせ生成</small></span><span class="stage-status">待機</span></div>
+          <div class="stage" data-stage="validate"><span class="stage-no">04</span><span class="stage-name">VALIDATE<small>市場証拠</small></span><span class="stage-status">待機</span></div>
+          <div class="stage" data-stage="score"><span class="stage-no">05</span><span class="stage-name">SCORE<small>100点評価</small></span><span class="stage-status">待機</span></div>
+          <div class="stage" data-stage="falsify"><span class="stage-no">06</span><span class="stage-name">FALSIFY<small>強制反証</small></span><span class="stage-status">待機</span></div>
+          <div class="stage" data-stage="build"><span class="stage-no">07</span><span class="stage-name">BUILD<small>MVP Brief</small></span><span class="stage-status">待機</span></div>
+          <div class="stage" data-stage="qa"><span class="stage-no">08</span><span class="stage-name">QA<small>公開前確認</small></span><span class="stage-status">待機</span></div>
+        </div>
+      </section>
+
+      <section class="panel discovery-lab" id="discoveryLab">
+        <div class="section-head"><div><div class="panel-label">DISCOVERY LAB</div><h2>面白い資産から、作れるものを考える。</h2></div><div class="section-tools discovery-tools"><button class="secondary-button" id="spotlightNext">次の注目資産</button><button class="primary-button" id="combinationNext">組み合わせを見る</button></div></div>
+        <div class="discovery-intro"><span class="discovery-spark">✦</span><p>これは単なる人気ランキングではありません。商用条件・無料運用性・用途の広さを見ながら、「この公開資産があるなら、何を短期間で検証できるか」を先に提示します。</p></div>
+        <div class="spotlight-grid" id="spotlightGrid"><div class="empty-state compact-empty"><span class="empty-mark">✦</span><strong>探索後に注目資産が表示されます</strong><p>「探索を開始」または保存済みデータを読み込んでください。</p></div></div>
+        <div class="combination-box"><div class="combination-head"><div><div class="panel-label">FROM ASSET TO MVP</div><h3>この組み合わせなら、こんなMVPが作れそう</h3></div><span class="combination-counter" id="combinationCounter">—</span></div><div class="combination-grid" id="combinationGrid"><div class="empty-state compact-empty"><p>資産を2つ以上確認すると、組み合わせ案が表示されます。</p></div></div></div>
+      </section>
+
+      <section class="stat-grid">
+        <article class="stat-card"><span class="stat-index">ASSETS FOUND</span><strong id="assetCount">0</strong><small>重複除去後の確認件数</small></article>
+        <article class="stat-card emphasis"><span class="stat-index">LICENSE PASS</span><strong id="acceptedCount">0</strong><small>商用条件が明確な候補</small></article>
+        <article class="stat-card warning-card"><span class="stat-index">REVIEW QUEUE</span><strong id="reviewCount">0</strong><small>LICENSE_REVIEW_REQUIRED</small></article>
+        <article class="stat-card"><span class="stat-index">HYPOTHESES</span><strong id="hypothesisCount">0</strong><small>組み合わせ型の仮説</small></article>
+        <article class="stat-card"><span class="stat-index">MARKET EVIDENCE</span><strong id="evidenceCount">0</strong><small>登録済みの支払い・発注等</small></article>
+      </section>
+
+      <section class="workspace-grid">
+        <div class="workspace-main">
+          <section class="panel assets-panel">
+            <div class="section-head"><div><div class="panel-label">01 · SCOUT / FILTER</div><h2>公開資産レジストリ</h2></div><div class="section-tools"><input id="assetSearch" type="search" placeholder="資産を検索" aria-label="資産を検索" /><select id="assetLicense" aria-label="ライセンス状態"><option value="all">すべて</option><option value="PASS">PASS</option><option value="REVIEW">REVIEW</option><option value="EXCLUDE">EXCLUDE</option></select></div></div>
+            <div class="guard-note"><span>◈</span><p>ライセンス不明・商用利用不可・有料依存の資産は、仮説の組み立てから除外します。</p></div>
+            <div class="asset-list" id="assetList"><div class="empty-state"><span class="empty-mark">◎</span><strong>探索データがありません</strong><p>「探索を開始」または保存済みスナップショットを読み込んでください。</p></div></div>
+          </section>
+
+          <section class="panel hypothesis-panel">
+            <div class="section-head"><div><div class="panel-label">03 · BUSINESS COMPOSER</div><h2>組み合わせ仮説</h2></div><span class="section-caption">候補20件 / 市場証拠は別管理</span></div>
+            <div class="hypothesis-note"><div class="note-icon">!</div><p>実際に取得した公開資産を組み合わせます。競合の存在だけでは需要点を加算せず、支払い・発注・求人などの証拠を登録するまでBuildしません。</p></div>
+            <div class="hypothesis-list" id="hypothesisList"><div class="empty-state"><span class="empty-mark">△</span><strong>仮説はまだありません</strong><p>商用利用条件が明確な資産が必要です。</p></div></div>
+          </section>
+        </div>
+
+        <aside class="workspace-side">
+          <section class="panel build-panel" id="buildPanel"><div class="build-empty"><span class="build-icon">✦</span><h2>Build Gate</h2><p>需要証拠・ライセンス・0円条件・反証を通過した候補だけを表示します。</p><span class="gate-state">NO BUILD</span></div></section>
+          <section class="panel operations-panel"><div class="section-head compact"><div><div class="panel-label">RUN LOG</div><h2>実行ログ</h2></div><span class="lock-label">LOCAL ONLY</span></div><ol class="log-list" id="logList"><li class="muted">実行ログはここに表示されます。</li></ol></section>
+          <section class="panel safety-panel"><div class="panel-label">GUARDRAILS</div><h2>0円の境界線</h2><ul><li><span>✓</span>有料API・カード登録を使わない</li><li><span>✓</span>個人情報を保存しない</li><li><span>✓</span>公開操作は人間承認</li><li><span>✓</span>定期cronは設定しない</li></ul></section>
+        </aside>
+      </section>
+
+      <section class="export-bar panel"><div><div class="panel-label">HANDOFF</div><h2>検証できる形で持ち出す。</h2><p>レポートとスナップショットは、この端末からのみ書き出します。</p></div><div class="export-actions"><button class="secondary-button" id="exportJsonButton">JSONを書き出す</button><button class="primary-button" id="exportReportButton">レポートを保存</button><button class="danger-button" id="resetButton">ローカルデータを削除</button></div></section>
+    </main>
+
+    <footer class="app-shell footer"><span>AI VENTURE BUILDER v0.2</span><span>Manual · Evidence-first · No paid API</span></footer>
+
+    <dialog id="evidenceDialog" class="evidence-dialog"><form method="dialog" id="evidenceForm"><div class="dialog-top"><div><div class="panel-label">VALIDATOR</div><h2 id="evidenceTitle">市場証拠を追加</h2></div><button type="button" class="dialog-close" id="cancelEvidence" aria-label="閉じる">×</button></div><p class="dialog-copy">競合の存在だけではなく、実際の支払い・発注・求人・レビュー等を記録してください。</p><label>証拠の種類<select name="type" required><option value="payment">支払い・売上</option><option value="contract">契約・発注</option><option value="job">求人・業務委託</option><option value="review">有料レビュー・導入事例</option><option value="complaint">困りごとの投稿</option><option value="price">価格表示のみ</option><option value="competitor">競合存在のみ</option></select></label><label>URL（任意）<input name="url" type="url" placeholder="https://..." /></label><label>メモ（任意）<textarea name="note" rows="3" placeholder="何が支払意欲の証拠になるか"></textarea></label><div class="dialog-actions"><button type="button" class="secondary-button" id="cancelEvidence2">キャンセル</button><button type="submit" class="primary-button">証拠を登録</button></div></form></dialog>
+    <dialog id="falsificationDialog" class="evidence-dialog"><form method="dialog" id="falsificationForm"><div class="dialog-top"><div><div class="panel-label">FALSIFY</div><h2 id="falsificationTitle">強制反証</h2></div><button type="button" class="dialog-close" id="cancelFalsification" aria-label="閉じる">×</button></div><p class="dialog-copy">候補を守るためではなく、失敗理由を先に探します。実際に確認した内容だけを記録してください。</p><label class="check-row"><input type="checkbox" name="freeAlternative" /> 無料代替で十分ではないか確認した</label><label class="check-row"><input type="checkbox" name="bigTech" /> Big Techや既存大手の参入リスクを確認した</label><label class="check-row"><input type="checkbox" name="terms" /> データ取得元・Marketplace・APIの規約を確認した</label><label class="check-row"><input type="checkbox" name="legal" /> 法律・著作権・個人情報のリスクを確認した</label><label class="check-row"><input type="checkbox" name="maintenance" /> 維持・サポート・価格競争の負担を確認した</label><label>強い反証の数<select name="strongCounterarguments"><option value="0">0件</option><option value="1">1件</option><option value="2">2件以上</option></select></label><label>反証メモ<textarea name="note" rows="4" required placeholder="最も危険な失敗理由と、それでも残る勝ち筋"></textarea></label><div class="dialog-actions"><button type="button" class="secondary-button" id="cancelFalsification">キャンセル</button><button type="submit" class="primary-button">反証を記録</button></div></form></dialog>
+    <div class="toast" id="toast" role="status"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
