@@ -1,0 +1,16 @@
+{
+  "name": "ai-venture-builder",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Manual, local-first, evidence-first venture discovery system built from public assets.",
+  "type": "module",
+  "scripts": {
+    "scout": "node scripts/scout.mjs",
+    "scout:dry": "node scripts/scout.mjs --dry-run",
+    "qa": "node scripts/qa.mjs",
+    "qa:v2": "node scripts/qa-v2.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
