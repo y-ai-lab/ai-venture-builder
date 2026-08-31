@@ -7,14 +7,14 @@
   "mode": "manual-workflow",
   "status": "paused",
   "cursor": {
-    "since": 905,
-    "lastId": 905,
+    "since": 1584,
+    "lastId": 1584,
     "exhaustedAt": null
   },
   "coverage": {
-    "batches": 2,
-    "cataloged": 200,
-    "primaryScanned": 200,
+    "batches": 3,
+    "cataloged": 300,
+    "primaryScanned": 300,
     "deepScanned": 0,
     "deepPending": 0,
     "deepFailed": 0,
@@ -23,8 +23,8 @@
     "licenseExclude": 0
   },
   "lastRun": {
-    "startedAt": "2026-08-31T07:41:51.214Z",
-    "finishedAt": "2026-08-31T07:41:51.496Z",
+    "startedAt": "2026-08-31T07:52:29.545Z",
+    "finishedAt": "2026-08-31T07:52:30.138Z",
     "batchSize": 100,
     "deepLimit": 8,
     "dryRun": false,
@@ -60,10 +60,24 @@
       "status": "ok",
       "count": 100,
       "deepCandidatesQueued": 0
+    },
+    {
+      "at": "2026-08-31T07:52:30.135Z",
+      "stage": "catalog",
+      "status": "ok",
+      "count": 100,
+      "rateLimitRemaining": 4998
+    },
+    {
+      "at": "2026-08-31T07:52:30.137Z",
+      "stage": "primary",
+      "status": "ok",
+      "count": 100,
+      "deepCandidatesQueued": 0
     }
   ],
   "deepQueue": [],
   "failedDeep": [],
   "topCandidates": [],
-  "lastShard": "data/inventory/shards/catalog-372-905.json"
+  "lastShard": "data/inventory/shards/catalog-912-1584.json"
 }
