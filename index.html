@@ -6,7 +6,7 @@
     <meta name="description" content="公開資産から0円で検証可能な事業を組み立てる、手動起動型のAI Venture Builder。" />
     <meta name="theme-color" content="#0c1118" />
     <title>AI Venture Builder v0.2</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=0.2.1" />
   </head>
   <body>
     <div class="ambient ambient-one"></div>
@@ -108,6 +108,6 @@
     <dialog id="evidenceDialog" class="evidence-dialog"><form method="dialog" id="evidenceForm"><div class="dialog-top"><div><div class="panel-label">VALIDATOR</div><h2 id="evidenceTitle">市場証拠を追加</h2></div><button type="button" class="dialog-close" id="cancelEvidence" aria-label="閉じる">×</button></div><p class="dialog-copy">競合の存在だけではなく、実際の支払い・発注・求人・レビュー等を記録してください。</p><label>証拠の種類<select name="type" required><option value="payment">支払い・売上</option><option value="contract">契約・発注</option><option value="job">求人・業務委託</option><option value="review">有料レビュー・導入事例</option><option value="complaint">困りごとの投稿</option><option value="price">価格表示のみ</option><option value="competitor">競合存在のみ</option></select></label><label>URL（任意）<input name="url" type="url" placeholder="https://..." /></label><label>メモ（任意）<textarea name="note" rows="3" placeholder="何が支払意欲の証拠になるか"></textarea></label><div class="dialog-actions"><button type="button" class="secondary-button" id="cancelEvidence2">キャンセル</button><button type="submit" class="primary-button">証拠を登録</button></div></form></dialog>
     <dialog id="falsificationDialog" class="evidence-dialog"><form method="dialog" id="falsificationForm"><div class="dialog-top"><div><div class="panel-label">FALSIFY</div><h2 id="falsificationTitle">強制反証</h2></div><button type="button" class="dialog-close" id="cancelFalsification" aria-label="閉じる">×</button></div><p class="dialog-copy">候補を守るためではなく、失敗理由を先に探します。実際に確認した内容だけを記録してください。</p><label class="check-row"><input type="checkbox" name="freeAlternative" /> 無料代替で十分ではないか確認した</label><label class="check-row"><input type="checkbox" name="bigTech" /> Big Techや既存大手の参入リスクを確認した</label><label class="check-row"><input type="checkbox" name="terms" /> データ取得元・Marketplace・APIの規約を確認した</label><label class="check-row"><input type="checkbox" name="legal" /> 法律・著作権・個人情報のリスクを確認した</label><label class="check-row"><input type="checkbox" name="maintenance" /> 維持・サポート・価格競争の負担を確認した</label><label>強い反証の数<select name="strongCounterarguments"><option value="0">0件</option><option value="1">1件</option><option value="2">2件以上</option></select></label><label>反証メモ<textarea name="note" rows="4" required placeholder="最も危険な失敗理由と、それでも残る勝ち筋"></textarea></label><div class="dialog-actions"><button type="button" class="secondary-button" id="cancelFalsification">キャンセル</button><button type="submit" class="primary-button">反証を記録</button></div></form></dialog>
     <div class="toast" id="toast" role="status"></div>
-    <script type="module" src="./app.js"></script>
+    <script type="module" src="./app.js?v=0.2.1"></script>
   </body>
 </html>
