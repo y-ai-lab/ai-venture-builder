@@ -1,12 +1,22 @@
 export const VERSION = "0.3.0";
 
 const PAID_TYPES = new Set(["sale", "contract", "paid_review"]);
+const STRONG_SUPPORT_TYPES = new Set(["sale", "contract", "paid_review", "job", "complaint"]);
 const SUPPORT_TYPES = new Set(["job", "complaint", "price_displayed", "competitor_only", "sale", "contract", "paid_review"]);
 const PASS_LICENSES = new Set(["mit", "apache-2.0", "bsd-2-clause", "bsd-3-clause", "isc", "unlicense", "cc0-1.0"]);
 const REVIEW_LICENSES = new Set(["gpl-2.0", "gpl-3.0", "lgpl-2.1", "lgpl-3.0", "agpl-3.0", "mpl-2.0", "epl-2.0"]);
 
 function text(value) {
   return value == null ? "" : String(value).trim();
+}
+
+function safeWebUrl(value) {
+  try {
+    const url = new URL(text(value));
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
 }
 
 function slug(value) {
@@ -24,7 +34,7 @@ export function normalizeEvidence(input = {}) {
     id: text(input.id || `e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`),
     type: SUPPORT_TYPES.has(type) ? type : "job",
     source: text(input.source),
-    url: text(input.url),
+    url: safeWebUrl(input.url),
     note: text(input.note),
     amount: Number(input.amount || 0),
     observedAt: text(input.observedAt || new Date().toISOString()),
@@ -34,12 +44,13 @@ export function normalizeEvidence(input = {}) {
 export function evidenceSummary(evidence = []) {
   const normalized = evidence.map(normalizeEvidence).filter((item) => item.url || item.note);
   const paid = normalized.filter((item) => PAID_TYPES.has(item.type));
-  const support = normalized.filter((item) => SUPPORT_TYPES.has(item.type));
+  const strongSupport = normalized.filter((item) => STRONG_SUPPORT_TYPES.has(item.type));
   const jobs = normalized.filter((item) => item.type === "job");
   return {
     total: normalized.length,
     paidCount: paid.length,
-    supportCount: support.length,
+    strongSupportCount: strongSupport.length,
+    supportCount: normalized.length,
     jobCount: jobs.length,
     paidAmountTotal: paid.reduce((sum, item) => sum + Math.max(0, item.amount || 0), 0),
     items: normalized,
@@ -54,8 +65,9 @@ export function evaluatePainGate(pain = {}) {
 
   if (!text(pain.customer)) blockers.push("顧客が定義されていない");
   if (!text(pain.problem)) blockers.push("顧客の悩みが定義されていない");
+  if (!text(pain.offer)) blockers.push("最初に売る成果物が定義されていない");
   if (evidence.paidCount < 1) blockers.push("実際の支払い・契約・有料購入証拠が最低1件必要");
-  if (evidence.supportCount < 3) blockers.push("補助需要証拠を含め合計3件以上必要");
+  if (evidence.strongSupportCount < 3) blockers.push("実支払・求人・具体的困りごと等の強い需要証拠を合計3件以上必要");
   if (!text(pain.channel)) blockers.push("最初の販売チャネルが未決定");
   if (price <= 0) blockers.push("販売価格が未決定");
   if (!text(pain.firstCustomerRoute)) blockers.push("最初の顧客への到達方法が未決定");
@@ -134,8 +146,8 @@ export function normalizeGithubAsset(repo = {}, query = "") {
     id: String(repo.id || repo.full_name),
     name: repo.full_name || repo.name,
     description: repo.description || "",
-    url: repo.html_url || "",
-    homepage: repo.homepage || "",
+    url: safeWebUrl(repo.html_url),
+    homepage: safeWebUrl(repo.homepage),
     stars: Number(repo.stargazers_count || 0),
     forks: Number(repo.forks_count || 0),
     language: repo.language || "",
