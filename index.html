@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="実際にお金が動いている悩みから始め、無料公開資産で0円MVPを組み立てるDemand-first AI Venture Builder。" />
     <meta name="theme-color" content="#0c1118" />
-    <title>AI Venture Builder v0.3</title>
+    <title>AI Venture Builder v0.4</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./styles-v3.css" />
   </head>
   <body>
     <main class="v3-shell">
       <section class="v3-hero">
-        <div class="v3-kicker">PAID PAIN → PUBLIC ASSET → MVP</div>
+        <div class="v3-kicker">PAID PAIN → MVP → FIRST SALE</div>
         <h1>先に、お金が動いている<br /><em>悩みを探す。</em></h1>
-        <p class="v3-lede">AI VENTURE BUILDER v0.3は、面白いOSSから事業を考えません。まず「誰が、何に困り、実際にお金を払っているか」を証拠化し、その問題を0円の公開資産で解決できる時だけMVPへ進みます。</p>
-        <div class="v3-flow"><span><b>01</b> Paid Pain</span><span><b>02</b> 支払証拠</span><span><b>03</b> GitHub探索</span><span><b>04</b> License Guard</span><span><b>05</b> Build Gate</span><span><b>06</b> MVP</span></div>
+        <p class="v3-lede">AI VENTURE BUILDER v0.4は、実際にお金が動く悩みから0円MVPを作り、商品化・販売準備・納品・数値改善まで進めます。完成条件はコードではなく、最初の有料受注を取りに行ける状態です。</p>
+        <div class="v3-flow"><span><b>01</b> Paid Pain</span><span><b>02</b> 公開資産</span><span><b>03</b> MVP</span><span><b>04</b> QA</span><span><b>05</b> 商品化</span><span><b>06</b> 販売</span><span><b>07</b> 納品</span><span><b>08</b> 改善</span></div>
       </section>
 
       <section class="v3-grid">
@@ -90,14 +90,71 @@
             <hr class="v3-rule" />
             <div class="v3-kicker">RUN STATE</div>
             <p>最終GitHub探索：<strong id="lastRun">未実行</strong></p>
-            <p>Version：<strong id="versionLabel">v0.3.0</strong></p>
+            <p>Version：<strong id="versionLabel">v0.4.0</strong></p>
             <button class="v3-button secondary" id="resetButton" type="button">この端末の状態をリセット</button>
           </section>
         </aside>
       </section>
 
+      <section class="v3-card executor-section" id="auto-business-executor">
+        <div class="executor-head">
+          <div>
+            <div class="v3-kicker">AUTO BUSINESS EXECUTOR · FIRST PROOF BUSINESS</div>
+            <h2>Shopify CSV事業を、販売と納品まで動かす</h2>
+            <p class="v3-muted">LAUNCHER・SELLER・DELIVERY OPERATOR・GROWTH OPERATORが、MVP完成後の実行を引き継ぎます。</p>
+          </div>
+          <span class="gate-state pass" id="executorState">LAUNCH PACK READY</span>
+        </div>
+
+        <div class="executor-summary" id="executorSummary"></div>
+        <div class="executor-agents" id="executorAgents"></div>
+
+        <div class="executor-columns">
+          <section class="executor-panel">
+            <div class="v3-kicker">LAUNCHER / SELLER</div>
+            <h3>5,000円の商品として出品する</h3>
+            <img class="product-hero-image" src="./assets/shopify-csv-service.jpg" alt="Shopify CSV 登録前チェック＋安全修正 5,000円" />
+            <div id="productSpec"></div>
+            <div class="v3-actions executor-actions">
+              <button class="v3-button" id="copyListingButton" type="button">ココナラ出品文をコピー</button>
+              <a class="v3-button link-button secondary" id="openMvpButton" href="https://y-ai-lab.github.io/ec-csv-preflight/" target="_blank" rel="noreferrer noopener">MVPを開く ↗</a>
+            </div>
+          </section>
+
+          <section class="executor-panel">
+            <div class="v3-kicker">DELIVERY OPERATOR</div>
+            <h3>受注から納品までを標準化</h3>
+            <ol class="delivery-flow">
+              <li>顧客CSVを受領</li><li>Preflight実行</li><li>安全修正</li><li>再チェック</li><li>PASS / REVIEW / HOLD</li><li>納品パック生成</li><li>人間最終確認</li>
+            </ol>
+            <div class="v3-actions executor-actions">
+              <button class="v3-button secondary" id="copyIntakeButton" type="button">購入後ヒアリングをコピー</button>
+              <button class="v3-button secondary" id="copyDeliveryButton" type="button">納品メッセージをコピー</button>
+            </div>
+          </section>
+        </div>
+
+        <section class="growth-panel">
+          <div class="executor-head compact-head">
+            <div><div class="v3-kicker">GROWTH OPERATOR</div><h3>7・14・30日の数字で判断する</h3></div>
+            <span class="growth-decision" id="growthDecision">KEEP</span>
+          </div>
+          <div class="metrics-grid">
+            <label>経過日<input id="metricDays" type="number" min="0" value="0" /></label>
+            <label>表示数<input id="metricViews" type="number" min="0" value="0" /></label>
+            <label>クリック<input id="metricClicks" type="number" min="0" value="0" /></label>
+            <label>お気に入り<input id="metricFavorites" type="number" min="0" value="0" /></label>
+            <label>問い合わせ<input id="metricInquiries" type="number" min="0" value="0" /></label>
+            <label>購入<input id="metricPurchases" type="number" min="0" value="0" /></label>
+            <label>売上（円）<input id="metricRevenue" type="number" min="0" value="0" /></label>
+            <label>作業時間（分）<input id="metricWorkMinutes" type="number" min="0" value="0" /></label>
+          </div>
+          <p class="growth-copy" id="growthCopy"></p>
+        </section>
+      </section>
+
       <footer class="v3-footer">
-        <strong>AI VENTURE BUILDER v0.3</strong> — Demand-first / ¥0 Cost Guard / Local-first evidence storage.<br />
+        <strong>AI VENTURE BUILDER v0.4</strong> — Demand-first / ¥0 Cost Guard / Auto Business Executor.<br />
         VALUE RADARとは独立したレーンです。公開資産は売り物ではなく、実需要を解決するための部品として扱います。
       </footer>
     </main>

@@ -1,12 +1,31 @@
-# AI VENTURE BUILDER v0.3
+# AI VENTURE BUILDER v0.4
 
-**PAID PAIN → PUBLIC ASSET → MVP**
+**PAID PAIN → PUBLIC ASSET → MVP → FIRST SALE**
 
 AI VENTURE BUILDERは、面白いOSSからビジネスを考えるツールではありません。
 
-まず「誰が、何に困り、実際にお金を払っているか」を証拠化し、その問題を追加費用0円の公開資産で解決できる場合だけMVP構築へ進む、Demand-firstの事業開発システムです。
+まず「誰が、何に困り、実際にお金を払っているか」を証拠化し、その問題を追加費用0円の公開資産で解決できる場合だけMVP構築へ進みます。v0.4では、MVP後の商品化・販売準備・納品・数値改善までをAUTO BUSINESS EXECUTORが引き継ぎます。
 
 公開ページ: https://y-ai-lab.github.io/ai-venture-builder/
+
+## v0.4 AUTO BUSINESS EXECUTOR
+
+MVP完成を終了地点にせず、次の4担当を画面と判定ロジックへ追加しました。
+
+- `LAUNCHER`: 商品名、価格、対応範囲、FAQ、販売文を確定
+- `SELLER`: 最初の販売チャネルを1つに絞り、実販売証拠と検索語を固定
+- `DELIVERY OPERATOR`: 受領、検査、安全修正、再チェック、納品メッセージを標準化
+- `GROWTH OPERATOR`: 表示・問い合わせ・購入・売上からKEEP / IMPROVE / PIVOT / KILLを判定
+
+最初の実証事業は、公開済みの `Shopify CSV Preflight` です。
+
+- MVP: https://y-ai-lab.github.io/ec-csv-preflight/
+- 価格: 5,000円
+- 販売チャネル: ココナラのみ
+- 基本範囲: 1ファイル・300データ行・2日・再チェック1回
+- Kill Criteria: 7日で露出改善、14日で商品条件改善、30日でPIVOTまたはKILL
+
+出品の最終公開、顧客CSVの意味確認、契約・本人確認だけを人間承認ポイントとして残します。
 
 ## v0.3で変えたこと
 

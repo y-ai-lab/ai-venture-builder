@@ -1,4 +1,4 @@
-export const VERSION = "0.3.0";
+export const VERSION = "0.4.0";
 
 const PAID_TYPES = new Set(["sale", "contract", "paid_review"]);
 const STRONG_SUPPORT_TYPES = new Set(["sale", "contract", "paid_review", "job", "complaint"]);

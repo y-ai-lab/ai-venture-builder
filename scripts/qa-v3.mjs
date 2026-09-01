@@ -9,7 +9,7 @@ import {
   makeBuildBrief,
 } from "../src/paid-pain-engine.mjs";
 
-assert.equal(VERSION, "0.3.0");
+assert.equal(VERSION, "0.4.0");
 
 const weakPain = {
   customer: "EC運営者",
@@ -71,4 +71,4 @@ assert.match(brief, /Demand-first Build Brief/);
 assert.match(brief, /EC運営者/);
 assert.match(brief, /example\/csv-validator/);
 
-console.log("AI VENTURE BUILDER v0.3 QA: PASS");
+console.log("AI VENTURE BUILDER demand-first QA: PASS");

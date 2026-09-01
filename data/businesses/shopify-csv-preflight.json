@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0",
+  "executorVersion": "0.4.0",
+  "businessId": "shopify-csv-preflight",
+  "status": "READY_FOR_LISTING_INPUT",
+  "mvp": {
+    "state": "COMPLETE",
+    "qa": "PASS",
+    "url": "https://y-ai-lab.github.io/ec-csv-preflight/",
+    "repository": "https://github.com/y-ai-lab/ec-csv-preflight",
+    "additionalCostYen": 0
+  },
+  "product": {
+    "name": "Shopify商品CSV 登録前チェック＋安全修正",
+    "customer": "Shopifyへ商品を一括登録する小規模EC運営者・制作担当者",
+    "priceYen": 5000,
+    "channel": "ココナラ",
+    "files": 1,
+    "dataRows": 300,
+    "deliveryDays": 2,
+    "rechecks": 1
+  },
+  "safety": {
+    "safeFixes": ["前後空白", "BOM", "明確な価格表記", "Status表記", "安全な文字列正規化"],
+    "needsReview": ["商品名", "Handle", "SKU", "欠損価格", "重複SKU", "壊れた画像URL", "Variant内容"],
+    "personalData": "商品データ以外は受領しない"
+  },
+  "validation": {
+    "primaryKpi": "最初の有料受注1件",
+    "day7": "表示が極端に少なければタイトル・カテゴリ・画像を改善",
+    "day14": "表示はあるが問い合わせ0なら商品内容・価格を改善",
+    "day30": "十分な表示があるのに購入0ならPIVOTまたはKILL"
+  }
+}

@@ -8,8 +8,19 @@ import {
   evaluateBuildGate,
   makeBuildBrief,
 } from "./src/paid-pain-engine.mjs";
+import {
+  SHOPIFY_CSV_BUSINESS,
+  EXECUTOR_AGENTS,
+  autonomyBreakdown,
+  evaluateGrowth,
+  launchReadiness,
+  makeDeliveryMessage,
+  makeIntakeMessage,
+  makeListingText,
+} from "./src/auto-business-executor.mjs";
 
 const STORAGE_KEY = "ai-venture-builder:v0.3:demand-first";
+const EXECUTOR_STORAGE_KEY = "ai-venture-builder:v0.4:auto-executor";
 const API = "https://api.github.com/search/repositories";
 const HEADERS = {
   Accept: "application/vnd.github+json",
@@ -37,6 +48,12 @@ let state = loadState() || {
   lastRun: null,
 };
 
+let executorState = loadExecutorState() || {
+  metrics: { days: 0, views: 0, clicks: 0, favorites: 0, inquiries: 0, purchases: 0, revenue: 0, workMinutes: 0 },
+  productImageReady: true,
+  listingInputComplete: false,
+};
+
 function $(id) { return document.getElementById(id); }
 function escapeHtml(value) {
   return String(value ?? "")
@@ -51,6 +68,12 @@ function saveState() {
 }
 function loadState() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); } catch { return null; }
+}
+function loadExecutorState() {
+  try { return JSON.parse(localStorage.getItem(EXECUTOR_STORAGE_KEY) || "null"); } catch { return null; }
+}
+function saveExecutorState() {
+  localStorage.setItem(EXECUTOR_STORAGE_KEY, JSON.stringify(executorState));
 }
 function readPainForm() {
   state.pain = {
@@ -159,11 +182,71 @@ function renderBuildGate() {
   $("briefPreview").textContent = makeBuildBrief({ pain: state.pain, selectedAssets: selected });
 }
 
+function renderExecutor() {
+  const business = SHOPIFY_CSV_BUSINESS;
+  const autonomy = autonomyBreakdown();
+  const readiness = launchReadiness(business, executorState);
+  const growth = evaluateGrowth(executorState.metrics);
+  $("executorState").textContent = readiness.readyToPublish ? "READY TO PUBLISH" : "LAUNCH PACK READY";
+  $("executorSummary").innerHTML = `
+    <div><span>MVP</span><strong>完成</strong><small>GitHub Pages</small></div>
+    <div><span>QA</span><strong>成功</strong><small>安全修正テスト</small></div>
+    <div><span>商品価格</span><strong>${business.price.toLocaleString("ja-JP")}円</strong><small>${escapeHtml(business.channel)} 1チャネル</small></div>
+    <div><span>販売素材</span><strong>${readiness.percent}%</strong><small>${readiness.completed}/${readiness.total}項目</small></div>
+    <div><span>AI自律率</span><strong>${autonomy.percent}%</strong><small>最終公開・意味確認は人間</small></div>
+  `;
+  $("executorAgents").innerHTML = EXECUTOR_AGENTS.map((agent) => `
+    <article><div class="agent-top"><span>${escapeHtml(agent.name)}</span><b>${escapeHtml(agent.status)}</b></div><h3>${escapeHtml(agent.role)}</h3><p>${agent.items.map(escapeHtml).join(" · ")}</p></article>
+  `).join("");
+  $("productSpec").innerHTML = `
+    <dl class="product-spec">
+      <div><dt>顧客</dt><dd>${escapeHtml(business.customer)}</dd></div>
+      <div><dt>納品</dt><dd>${business.deliverables.map(escapeHtml).join(" / ")}</dd></div>
+      <div><dt>基本範囲</dt><dd>${business.fileLimit}ファイル・${business.rowLimit}行・${business.deliveryDays}日・再チェック${business.revisions}回</dd></div>
+      <div><dt>自動修正</dt><dd>${business.safeFixes.map(escapeHtml).join(" / ")}</dd></div>
+      <div><dt>禁止</dt><dd>${business.neverGuess.map(escapeHtml).join(" / ")}</dd></div>
+    </dl>
+    <p class="launch-next"><b>次の外部操作：</b>${readiness.readyToPublish ? "ココナラの公開ボタンを押す" : `${escapeHtml(readiness.nextAction)}を完了する`}</p>
+  `;
+  $("growthDecision").textContent = growth.decision;
+  $("growthDecision").dataset.decision = growth.decision;
+  $("growthCopy").innerHTML = `<strong>${escapeHtml(growth.reason)}</strong><br>${escapeHtml(growth.action)}<br><small>問い合わせ率 ${growth.inquiryRate.toFixed(1)}% / 成約率 ${growth.conversionRate.toFixed(1)}%</small>`;
+}
+
+function readMetrics() {
+  executorState.metrics = {
+    days: Number($("metricDays").value || 0),
+    views: Number($("metricViews").value || 0),
+    clicks: Number($("metricClicks").value || 0),
+    favorites: Number($("metricFavorites").value || 0),
+    inquiries: Number($("metricInquiries").value || 0),
+    purchases: Number($("metricPurchases").value || 0),
+    revenue: Number($("metricRevenue").value || 0),
+    workMinutes: Number($("metricWorkMinutes").value || 0),
+  };
+  saveExecutorState();
+  renderExecutor();
+}
+
+function writeMetrics() {
+  const mapping = { metricDays: "days", metricViews: "views", metricClicks: "clicks", metricFavorites: "favorites", metricInquiries: "inquiries", metricPurchases: "purchases", metricRevenue: "revenue", metricWorkMinutes: "workMinutes" };
+  for (const [id, key] of Object.entries(mapping)) $(id).value = executorState.metrics?.[key] || 0;
+}
+
+async function copyExecutorText(buttonId, value) {
+  await navigator.clipboard.writeText(value);
+  const button = $(buttonId);
+  const original = button.textContent;
+  button.textContent = "コピーしました";
+  setTimeout(() => { button.textContent = original; }, 1400);
+}
+
 function render() {
   renderEvidence();
   renderPainGate();
   renderAssets();
   renderBuildGate();
+  renderExecutor();
   $("versionLabel").textContent = `v${VERSION}`;
   $("lastRun").textContent = state.lastRun ? new Date(state.lastRun).toLocaleString("ja-JP") : "未実行";
 }
@@ -230,12 +313,14 @@ async function copyBrief() {
 }
 
 function resetAll() {
-  if (!window.confirm("この端末に保存したVENTURE BUILDER v0.3の状態を削除しますか？")) return;
+  if (!window.confirm("この端末に保存したVENTURE BUILDERの探索・販売検証状態を削除しますか？")) return;
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(EXECUTOR_STORAGE_KEY);
   location.reload();
 }
 
 writePainForm();
+writeMetrics();
 render();
 ["customer","problem","offer","price","channel","firstCustomerRoute","killCriteria","autonomyPercent","zeroCost","oneDayMvp","solutionHint"].forEach((id) => {
   $(id).addEventListener(id === "zeroCost" || id === "oneDayMvp" ? "change" : "input", readPainForm);
@@ -244,3 +329,9 @@ $("addEvidenceButton").addEventListener("click", addEvidence);
 $("assetScoutButton").addEventListener("click", scoutAssets);
 $("copyBriefButton").addEventListener("click", copyBrief);
 $("resetButton").addEventListener("click", resetAll);
+for (const id of ["metricDays","metricViews","metricClicks","metricFavorites","metricInquiries","metricPurchases","metricRevenue","metricWorkMinutes"]) {
+  $(id).addEventListener("input", readMetrics);
+}
+$("copyListingButton").addEventListener("click", () => copyExecutorText("copyListingButton", makeListingText()));
+$("copyIntakeButton").addEventListener("click", () => copyExecutorText("copyIntakeButton", makeIntakeMessage()));
+$("copyDeliveryButton").addEventListener("click", () => copyExecutorText("copyDeliveryButton", makeDeliveryMessage()));

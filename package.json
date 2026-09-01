@@ -1,11 +1,13 @@
 {
   "name": "ai-venture-builder",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
-  "description": "Demand-first venture builder: validate paid pain first, then find zero-cost public assets for an MVP.",
+  "description": "Demand-first venture builder that carries a zero-cost MVP through productization, delivery, and first-sale validation.",
   "type": "module",
   "scripts": {
-    "qa": "node scripts/qa-v3.mjs",
+    "qa": "node scripts/qa-v3.mjs && node scripts/qa-v4.mjs",
+    "check": "node --check app-v3.js && node --check src/paid-pain-engine.mjs && node --check src/auto-business-executor.mjs",
+    "verify": "npm run check && npm run qa",
     "inventory:legacy": "node scripts/full-inventory.mjs --dry-run"
   },
   "engines": {
